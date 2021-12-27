@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:recipe_book/models/recipe.dart';
 
-import '../../viewer/Viewer.dart';
+import '../../viewer/viewer.dart';
 
 class RecipeTile extends StatelessWidget {
   final Recipe recipe;
@@ -24,7 +24,7 @@ class RecipeTile extends StatelessWidget {
               MaterialPageRoute(builder: (context) => Viewer(recipe: recipe)),
             );
           },
-          contentPadding: EdgeInsets.only(top: 0),
+          contentPadding: const EdgeInsets.only(top: 0),
           leading: Image.network(
             recipe.imgLink!,
             width: 50,

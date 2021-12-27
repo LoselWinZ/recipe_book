@@ -30,7 +30,7 @@ class _SignInState extends State<SignIn> {
             backgroundColor: backgroundColor,
             appBar: AppBar(backgroundColor: backgroundColorDark, elevation: 0.0, title: Text("Anmelden", style: coloredText.style), actions: <Widget>[
               TextButton.icon(
-                  icon: const Icon(Icons.person, color: textColor),
+                  icon: Icon(Icons.person, color: textColor),
                   onPressed: () {
                     widget.toggleView!();
                   },
@@ -46,13 +46,15 @@ class _SignInState extends State<SignIn> {
                       TextFormField(
                           onChanged: (val) => setState(() => email = val),
                           validator: (val) => val!.isEmpty ? 'Bitte ausfüllen' : null,
-                          decoration: textInputDecoration.copyWith(hintText: 'Email', prefixIcon: const Icon(Icons.mail, color: textColor))),
+                          style: coloredText.style,
+                          decoration: textInputDecoration.copyWith(hintText: 'Email', prefixIcon: Icon(Icons.mail, color: textColor))),
                       const SizedBox(height: 20),
                       TextFormField(
                           onChanged: (val) => setState(() => password = val),
                           obscureText: true,
                           validator: (val) => val!.length < 6 ? 'Mindestens 6 Zeichen' : null,
-                          decoration: textInputDecoration.copyWith(hintText: 'Passwort', prefixIcon: const Icon(Icons.lock, color: textColor))),
+                          style: coloredText.style,
+                          decoration: textInputDecoration.copyWith(hintText: 'Passwort', prefixIcon: Icon(Icons.lock, color: textColor))),
                       const SizedBox(height: 20),
                       ElevatedButton(
                           style: ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent), shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(5), side: const BorderSide(color: primaryColor, width: 2)))),
@@ -60,7 +62,7 @@ class _SignInState extends State<SignIn> {
                         if (_formKey.currentState != null && _formKey.currentState!.validate()) {
                           setState(() => loading = true);
                           dynamic user = await _authService.login(email, password);
-                          print(user);
+                          debugPrint(user);
                           if (user == null) {
                             setState(() {
                               error = 'user not found';
@@ -68,7 +70,6 @@ class _SignInState extends State<SignIn> {
                             });
                           }
                           setState(() {
-                            Navigator.pop(context);
                             loading = false;
                           });
                         }

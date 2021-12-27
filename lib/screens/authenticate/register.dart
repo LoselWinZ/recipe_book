@@ -38,7 +38,7 @@ class _State extends State<Register> {
                 title: Text('Registrieren', style: coloredText.style),
                 actions: <Widget>[
                   TextButton.icon(
-                      icon: const Icon(Icons.person, color: textColor,),
+                      icon: Icon(Icons.person, color: textColor,),
                       onPressed: () {
                         widget.toggleView!();
                       },
@@ -58,8 +58,9 @@ class _State extends State<Register> {
                         },
                         validator: (val) =>
                             val!.isEmpty ? 'Bitte ausfüllen' : null,
+                        style: coloredText.style,
                         decoration:
-                            textInputDecoration.copyWith(hintText: 'Email', prefixIcon: const Icon(Icons.mail, color: textColor)),
+                            textInputDecoration.copyWith(hintText: 'Email', prefixIcon: Icon(Icons.mail, color: textColor)),
                       ),
                       const SizedBox(height: 20),
                       TextFormField(
@@ -69,8 +70,9 @@ class _State extends State<Register> {
                           obscureText: true,
                           validator: (val) =>
                               val!.length < 6 ? 'Mindestens 6 Zeichen' : null,
+                          style: coloredText.style,
                           decoration: textInputDecoration.copyWith(
-                              hintText: 'Passwort', prefixIcon: const Icon(Icons.lock, color: textColor))),
+                              hintText: 'Passwort', prefixIcon: Icon(Icons.lock, color: textColor))),
                       const SizedBox(height: 20),
                       TextFormField(
                           onChanged: (val) {
@@ -79,8 +81,9 @@ class _State extends State<Register> {
                           obscureText: true,
                           validator: (val) =>
                           val!.isEmpty ? 'Bitte ausfüllen' : null,
+                          style: coloredText.style,
                           decoration: textInputDecoration.copyWith(
-                              hintText: 'Benutzername', prefixIcon: const Icon(Icons.person, color: textColor))),
+                              hintText: 'Benutzername', prefixIcon: Icon(Icons.person, color: textColor))),
                       const SizedBox(height: 20),
                       ElevatedButton(
                           style: ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent), shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(5), side: const BorderSide(color: primaryColor, width: 2)))),
