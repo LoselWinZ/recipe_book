@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
       value: AuthService().user,
       child: const MaterialApp(
         title: "Essenfürdichundmich",
-        home: BottomNavigation()
+        home: BottomNavigation(),
       ),
     );
   }

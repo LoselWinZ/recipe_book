@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:recipe_book/home/recipe_widget.dart';
-import 'package:recipe_book/list/shopping_list.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:recipe_book/list/lists_provider.dart';
+import 'package:recipe_book/screens/recipe/recipe_widget.dart';
 import 'package:recipe_book/screens/authenticate/authenticate.dart';
 import 'package:recipe_book/search/search.dart';
 import 'package:recipe_book/shared/app_bar.dart';
@@ -14,8 +15,12 @@ class BottomNavigation extends StatefulWidget {
 }
 
 class _BottomNavigationState extends State<BottomNavigation> {
+  
+  
+  
   int _selectedIndex = 0;
-  static final List<Widget> _widgetOptions = <Widget>[const RecipeWidget(), const SearchProvider(), const ShoppingList(), const Authenticate()];
+  static final List<Widget> _widgetOptions = <Widget>[const RecipeWidget(), const SearchProvider(), const ListsProvider(), const Authenticate()];
+  final List<String> names = ["Rezepte", "Suche", "Einkaufslisten", "Account"];
 
   void _onItemTapped(int index) {
     setState(() {
@@ -26,7 +31,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(),
+      appBar: CustomAppBar(text: names[_selectedIndex], setIndex: _onItemTapped,),
       body: _widgetOptions.elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
@@ -56,5 +61,11 @@ class _BottomNavigationState extends State<BottomNavigation> {
         onTap: _onItemTapped,
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initializeDateFormatting('de');
   }
 }

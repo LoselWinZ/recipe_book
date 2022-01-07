@@ -98,27 +98,31 @@ class _IngredientCardState extends State<IngredientCard> {
                         ],
                       ),
                       const SizedBox(height: 20),
-                      ListView.builder(
-                          itemBuilder: (context, index) {
-                            return Column(
-                              children: [
-                                IngredientTile(
-                                  recipeIngredient: snapshot.data?[index],
-                                  multiplier: multiplier,
-                                  portion: widget.recipe.portions,
-                                ),
-                                Divider(
-                                  height: 10,
-                                  thickness: 0.5,
-                                  color: textColor.withAlpha(100),
-                                ),
-                              ],
-                            );
-                          },
-                          itemCount: snapshot.data != null ? snapshot.data!.length : 0,
-                          scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics())
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(minHeight: 150),
+                        child: ListView.builder(
+                            itemBuilder: (context, index) {
+                              return Column(
+                                children: [
+                                  IngredientTile(
+                                    recipeIngredient: snapshot.data?[index],
+                                    multiplier: multiplier,
+                                    portion: widget.recipe.portions,
+                                  ),
+                                  Divider(
+                                    height: 10,
+                                    thickness: 0.5,
+                                    color: textColor.withAlpha(100),
+                                  ),
+                                ],
+                              );
+                            },
+
+                            itemCount: snapshot.data != null ? snapshot.data!.length : 0,
+                            scrollDirection: Axis.vertical,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics()),
+                      )
                     ],
                   ),
                 ),
