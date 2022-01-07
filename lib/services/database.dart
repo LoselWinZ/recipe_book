@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:recipe_book/models/ingredient.dart';
 import 'package:recipe_book/models/list_item.dart';
 import 'package:recipe_book/models/list_model.dart';
 import 'package:recipe_book/models/meal_list.dart';
@@ -13,6 +14,7 @@ class DatabaseService {
   final CollectionReference userCollection = FirebaseFirestore.instance.collection('users');
   final CollectionReference recipeCollection = FirebaseFirestore.instance.collection('recipes');
   final CollectionReference listCollection = FirebaseFirestore.instance.collection('lists');
+  final CollectionReference ingredientCollection = FirebaseFirestore.instance.collection('ingredients');
 
   Future<void> createUserData(String displayName, String email, String uid) async {
     return await userCollection.doc(uid).set({"displayName": displayName, "email": email, "uid": uid});
@@ -49,16 +51,19 @@ class DatabaseService {
 
   Stream<MealList> getMealList(String id) {
     return listCollection.doc(id).collection('mealList').snapshots().map((QuerySnapshot querySnapshot) {
-      return querySnapshot.docs.map((QueryDocumentSnapshot documentSnapshot) {
-        var dynList = documentSnapshot["recipes"] as List<dynamic>;
-        return MealList(
-            name: documentSnapshot["name"],
-            id: documentSnapshot["id"],
-            userId: documentSnapshot["userId"],
-            created: documentSnapshot["created"],
-            owner: documentSnapshot["owner"],
-            recipes: dynList.map((e) => ListItem(name: e["name"], checked: e["checked"], amount: e["amount"])).toList());
-      }).toList().first;
+      return querySnapshot.docs
+          .map((QueryDocumentSnapshot documentSnapshot) {
+            var dynList = documentSnapshot["recipes"] as List<dynamic>;
+            return MealList(
+                name: documentSnapshot["name"],
+                id: documentSnapshot["id"],
+                userId: documentSnapshot["userId"],
+                created: documentSnapshot["created"],
+                owner: documentSnapshot["owner"],
+                recipes: dynList.map((e) => ListItem(name: e["name"], checked: e["checked"], amount: e["amount"])).toList());
+          })
+          .toList()
+          .first;
     });
   }
 
@@ -77,6 +82,13 @@ class DatabaseService {
 
   Stream<List<MealList>> mealListsByUserId(String? uid) {
     return listCollection.doc(uid).collection('mealList').where('userId', isEqualTo: uid).snapshots().map(_mealListsFromSnapshot);
+  }
+
+  Stream<List<Ingredient>> getIngredientsBySearchValue(String query) {
+    return ingredientCollection.orderBy("searchableIndex.$query").limit(5).snapshots().map((value) => value.docs.map((DocumentSnapshot documentSnapshot) {
+          debugPrint(documentSnapshot.id);
+          return Ingredient(id: documentSnapshot.id, name: documentSnapshot["name"], searchableIndex: documentSnapshot["searchableIndex"]);
+        }).toList());
   }
 
   List<MealList> _mealListsFromSnapshot(QuerySnapshot querySnapshot) {

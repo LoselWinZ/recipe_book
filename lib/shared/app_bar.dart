@@ -31,7 +31,9 @@ class _CustomAppBarState extends State<CustomAppBar> {
         shadowColor: Colors.black,
         toolbarHeight: 3000,
         title: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          GestureDetector(onTap: () => widget.setIndex != null ? widget.setIndex!(0) : Navigator.pop(context), child: Image.asset('lib/assets/favicon.ico', width: 30)),
+          widget.showBackButton != null && !widget.showBackButton!
+              ? GestureDetector(onTap: () => widget.setIndex != null ? widget.setIndex!(0) : Navigator.pop(context), child: Image.asset('lib/assets/favicon.ico', width: 30))
+              : const SizedBox(width: 0, height: 0),
           Text(widget.text != null ? widget.text! : '', style: coloredText.style)
         ]),
         actions: <Widget>[showPopupButton()]);

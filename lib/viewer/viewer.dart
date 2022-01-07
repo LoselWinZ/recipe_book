@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:provider/provider.dart';
 import 'package:recipe_book/services/parser.dart';
 import 'package:recipe_book/shared/app_bar.dart';
 import 'package:recipe_book/shared/constants.dart';
 
+import '../create_recipe/creator.dart';
 import '../models/recipe.dart';
 import '../models/user.dart';
 import 'ingredient_card.dart';
@@ -65,7 +67,8 @@ class _ViewerState extends State<Viewer> {
                           Text("Zubereitung", style: coloredText.style, textScaleFactor: 1.5),
                         ],
                       ),
-                      Text(ParserService().convert(widget.recipe.preparation!), style: coloredText.style),
+                      // Text(ParserService().convert(widget.recipe.preparation!), style: coloredText.style),
+                      Html(data: widget.recipe.preparation!, style: {"p": Style(color: textColor), "li": Style(color: textColor),"before": Style(color: textColor)})
                     ]),
                   ),
                   color: backgroundColorLight),
@@ -85,7 +88,10 @@ class _ViewerState extends State<Viewer> {
                       user != null && user.uid == widget.recipe.userId ? TextButton.icon(
                           icon: Icon(Icons.edit, color: textColor),
                           onPressed: () {
-
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const RecipeCreator()),
+                            );
                           },
                           label: Text('Bearbeiten', style: coloredText.style)) : Container()
                     ]),

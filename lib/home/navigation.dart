@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:recipe_book/list/lists_provider.dart';
-import 'package:recipe_book/screens/recipe/recipe_widget.dart';
-import 'package:recipe_book/screens/authenticate/authenticate.dart';
 import 'package:recipe_book/search/search.dart';
 import 'package:recipe_book/shared/app_bar.dart';
 import 'package:recipe_book/shared/constants.dart';
+
+import '../authenticate/authenticate.dart';
+import '../recipe/recipe_widget.dart';
 
 class BottomNavigation extends StatefulWidget {
   const BottomNavigation({Key? key}) : super(key: key);

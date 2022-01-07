@@ -41,6 +41,7 @@ class _ListsState extends State<Lists> {
         ),
       ),
       order: GroupedListOrder.DESC,
+      itemComparator: (item1, item2) => item1.created!.compareTo(item2.created!),
       itemBuilder: (context, index) {
         return ListModelTile(model: index);
       },
