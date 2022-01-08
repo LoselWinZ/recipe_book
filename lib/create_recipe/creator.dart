@@ -6,6 +6,7 @@ import 'package:recipe_book/shared/app_bar.dart';
 import 'package:recipe_book/shared/constants.dart';
 
 import '../models/categorie.dart';
+import '../services/algolia.dart';
 
 class RecipeCreator extends StatefulWidget {
   const RecipeCreator({Key? key}) : super(key: key);
@@ -16,6 +17,40 @@ class RecipeCreator extends StatefulWidget {
 
 class _RecipeCreatorState extends State<RecipeCreator> {
   final DatabaseService db = DatabaseService();
+  AlgoliaAPI algoliaAPI = AlgoliaAPI();
+  String _searchText = "";
+  List<Ingredient> _hitsList = [];
+  TextEditingController _textFieldController = TextEditingController();
+
+  Future<void> _getSearchResult(String query) async {
+    var response = await algoliaAPI.search(query);
+    var hitsList = (response['hits'] as List).map((json) {
+      return Ingredient.fromJson(json);
+    }).toList();
+    setState(() {
+      _hitsList = hitsList;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _textFieldController.addListener(() {
+      if (_searchText != _textFieldController.text) {
+        setState(() {
+          _searchText = _textFieldController.text;
+        });
+        _getSearchResult(_searchText);
+      }
+    });
+    _getSearchResult('');
+  }
+
+  @override
+  void dispose() {
+    _textFieldController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -115,55 +150,72 @@ class _RecipeCreatorState extends State<RecipeCreator> {
               ),
             ),
           ),
-          Autocomplete<Ingredient>(
-            fieldViewBuilder: (context, textEditingController, focusNode, onFieldSubmitted) {
-              return TextField(
-                  controller: textEditingController,
-                  focusNode: focusNode,
-                  style: coloredText.style,
-                  decoration: textInputDecoration.copyWith(
-                      hintText: 'Suche...',
-                      prefixIcon: Icon(Icons.search, color: textColor),
-                      suffixIcon: IconButton(
-                        icon: Icon(Icons.clear, color: textColor),
-                        onPressed: () {
-                          textEditingController.clear();
-                        },
-                        splashRadius: 1,
-                      )));
-            },
-            optionsViewBuilder: (context, onSelected, options) {
-              return Material(
-                child: Container(
-                  color: backgroundColor,
-                  child: ListView.builder(
-                    padding: EdgeInsets.all(10.0),
-                    itemCount: options.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      final Ingredient option = options.elementAt(index);
+          Column(
+            children: [
+              Autocomplete<Ingredient>(
+                fieldViewBuilder: (context, textEditingController, focusNode, onFieldSubmitted) {
+                  return TextField(
+                      controller: _textFieldController,
+                      focusNode: focusNode,
+                      style: coloredText.style,
+                      decoration: textInputDecoration.copyWith(
+                          hintText: 'Suche...',
+                          prefixIcon: Icon(Icons.search, color: textColor),
+                          suffixIcon: _searchText.isNotEmpty
+                              ? IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _textFieldController.clear();
+                                    });
+                                  },
+                                  icon: const Icon(Icons.clear),
+                                  splashRadius: 1,
+                                )
+                              : null));
+                },
+                optionsViewBuilder: (context, onSelected, options) {
+                  return Material(
+                    child: Container(
+                      color: backgroundColor,
+                      child: ListView.builder(
+                        padding: EdgeInsets.all(10.0),
+                        itemCount: options.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          final Ingredient option = options.elementAt(index);
 
-                      return GestureDetector(
-                        onTap: () {
-                          onSelected(option);
+                          return GestureDetector(
+                            onTap: () {
+                              onSelected(option);
+                            },
+                            child: ListTile(
+                              title: Text(option.name!, style: coloredText.style),
+                            ),
+                          );
                         },
-                        child: ListTile(
-                          title: Text(option.name!, style: coloredText.style),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              );
-            },
-            optionsBuilder: (TextEditingValue value) {
-              if (value.text == '') {
-                return const Iterable<Ingredient>.empty();
-              }
-              return Iterable<Ingredient>.empty();
-            },
-            displayStringForOption: (option) => option.name!,
-            onSelected: (option) {
-            },
+                      ),
+                    ),
+                  );
+                },
+                optionsBuilder: (TextEditingValue value) {
+                  if (value.text == '') {
+                    return const Iterable<Ingredient>.empty();
+                  }
+                  return Iterable<Ingredient>.empty();
+                },
+                displayStringForOption: (option) => option.name!,
+                onSelected: (option) {},
+              ),
+              // Expanded(
+              //     child: _hitsList.isEmpty
+              //         ? Center(child: Text('Alle Alle'))
+              //         : ListView.builder(
+              //             padding: const EdgeInsets.all(8),
+              //             itemCount: _hitsList.length,
+              //             itemBuilder: (BuildContext context, int index) {
+              //               return Container(
+              //                   height: 50, padding: EdgeInsets.all(8), child: Row(children: <Widget>[Expanded(child: Text('${_hitsList[index].name}')), Text('${_hitsList[index].}')]));
+              //             }))
+            ],
           ),
           Center(
             child: Text('Third Page'),
