@@ -1,8 +1,9 @@
+import 'package:algolia/algolia.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:recipe_book/shared/constants.dart';
 
 import '../models/recipe.dart';
+import '../services/algolia.dart';
 import '../viewer/viewer.dart';
 
 class SearchView extends StatefulWidget {
@@ -13,10 +14,35 @@ class SearchView extends StatefulWidget {
 }
 
 class _SearchViewState extends State<SearchView> {
+
+  AlgoliaAPI algoliaAPI = AlgoliaAPI();
+  List<Recipe> _hitsList = [];
+
+  Future<void> _getSearchResult(String query) async {
+    if (query.isEmpty) {
+      return Future.value('');
+    }
+    List<AlgoliaObjectSnapshot>? response = await algoliaAPI.search(query, 'recipes');
+    var hitsList = response!.map((json) {
+      return Recipe(
+          id: json.objectID,
+          name: json.data["name"],
+          userId: json.data["userId"],
+          preparation: json.data["preparation"],
+          portions: json.data["portions"],
+          imgLink: json.data["imgLink"],
+          description: json.data["description"],
+          cooktime: json.data["cooktime"],
+          categorie: json.data["categorie"],
+          author: json.data["author"]);
+    }).toList();
+    setState(() {
+      _hitsList = hitsList;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final recipes = Provider.of<List<Recipe>>(context);
-
     return Scaffold(
       backgroundColor: backgroundColor,
       body: Autocomplete<Recipe>(
@@ -59,11 +85,12 @@ class _SearchViewState extends State<SearchView> {
             ),
           );
         },
-        optionsBuilder: (TextEditingValue value) {
+        optionsBuilder: (TextEditingValue value) async {
           if (value.text == '') {
             return const Iterable<Recipe>.empty();
           }
-          return recipes.where((Recipe recipe) => recipe.name!.toLowerCase().contains(value.text.toLowerCase()));
+          await _getSearchResult(value.text);
+          return _hitsList;
         },
         displayStringForOption: (option) => option.name!,
         onSelected: (option) {

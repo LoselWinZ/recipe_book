@@ -11,25 +11,25 @@ import 'package:recipe_book/models/user.dart';
 import '../models/categorie.dart';
 
 class DatabaseService {
-  final CollectionReference userCollection = FirebaseFirestore.instance.collection('users');
-  final CollectionReference recipeCollection = FirebaseFirestore.instance.collection('recipes');
-  final CollectionReference listCollection = FirebaseFirestore.instance.collection('lists');
-  final CollectionReference ingredientCollection = FirebaseFirestore.instance.collection('ingredients');
+  final CollectionReference _userCollection = FirebaseFirestore.instance.collection('users');
+  final CollectionReference _recipeCollection = FirebaseFirestore.instance.collection('recipes');
+  final CollectionReference _listCollection = FirebaseFirestore.instance.collection('lists');
+  final CollectionReference _ingredientCollection = FirebaseFirestore.instance.collection('ingredients');
 
   Future<void> createUserData(String displayName, String email, String uid) async {
-    return await userCollection.doc(uid).set({"displayName": displayName, "email": email, "uid": uid});
+    return await _userCollection.doc(uid).set({"displayName": displayName, "email": email, "uid": uid});
   }
 
   void saveListZutat(ListModel model) {
-    listCollection.doc(model.id).update(model.toJson());
+    _listCollection.doc(model.id).update(model.toJson());
   }
 
   void saveMealListZutat(String listId, MealList model) {
-    listCollection.doc(listId).collection('mealList').doc(model.id).update(model.toJson());
+    _listCollection.doc(listId).collection('mealList').doc(model.id).update(model.toJson());
   }
 
   Future<CustomUser> getUserData(String uid) async {
-    return await userCollection
+    return await _userCollection
         .doc(uid)
         .snapshots()
         .map((DocumentSnapshot documentSnapshot) => CustomUser(email: documentSnapshot["email"], displayName: documentSnapshot["displayName"], uid: documentSnapshot["uid"]))
@@ -37,7 +37,7 @@ class DatabaseService {
   }
 
   Stream<ListModel> getList(String id) {
-    return listCollection.doc(id).snapshots().map((DocumentSnapshot documentSnapshot) {
+    return _listCollection.doc(id).snapshots().map((DocumentSnapshot documentSnapshot) {
       var dynList = documentSnapshot["zutaten"] as List<dynamic>;
       return ListModel(
           name: documentSnapshot["name"],
@@ -50,13 +50,13 @@ class DatabaseService {
   }
 
   Stream<MealList> getMealList(String id) {
-    return listCollection.doc(id).collection('mealList').snapshots().map((QuerySnapshot querySnapshot) {
+    return _listCollection.doc(id).collection('mealList').snapshots().map((QuerySnapshot querySnapshot) {
       return querySnapshot.docs
           .map((QueryDocumentSnapshot documentSnapshot) {
             var dynList = documentSnapshot["recipes"] as List<dynamic>;
             return MealList(
                 name: documentSnapshot["name"],
-                id: documentSnapshot["id"],
+                id: documentSnapshot.id,
                 userId: documentSnapshot["userId"],
                 created: documentSnapshot["created"],
                 owner: documentSnapshot["owner"],
@@ -68,24 +68,24 @@ class DatabaseService {
   }
 
   Stream<List<Recipe>> get recipes {
-    return recipeCollection.snapshots().map(_recipesFromSnapshot);
+    return _recipeCollection.snapshots().map(_recipesFromSnapshot);
   }
 
   Stream<List<Recipe>> recipesByCategorie(Categorie? categorie) {
     if (categorie == null) return recipes;
-    return recipeCollection.where('categorie', isEqualTo: categorie.name == Categorie.Getraenke.name ? 'Getränke' : categorie.name).snapshots().map((event) => _recipesFromSnapshot(event));
+    return _recipeCollection.where('categorie', isEqualTo: categorie.name == Categorie.Getraenke.name ? 'Getränke' : categorie.name).snapshots().map((event) => _recipesFromSnapshot(event));
   }
 
   Stream<List<ListModel>> listsByUserId(String? uid) {
-    return listCollection.orderBy("created", descending: true).where('userId', isEqualTo: uid).snapshots().map(_listsFromSnapshot);
+    return _listCollection.orderBy("created", descending: true).where('userId', isEqualTo: uid).snapshots().map(_listsFromSnapshot);
   }
 
   Stream<List<MealList>> mealListsByUserId(String? uid) {
-    return listCollection.doc(uid).collection('mealList').where('userId', isEqualTo: uid).snapshots().map(_mealListsFromSnapshot);
+    return _listCollection.doc(uid).collection('mealList').where('userId', isEqualTo: uid).snapshots().map(_mealListsFromSnapshot);
   }
 
   Stream<List<Ingredient>> getIngredientsBySearchValue(String query) {
-    return ingredientCollection.orderBy("searchableIndex.$query").limit(5).snapshots().map((value) => value.docs.map((DocumentSnapshot documentSnapshot) {
+    return _ingredientCollection.orderBy("searchableIndex.$query").limit(5).snapshots().map((value) => value.docs.map((DocumentSnapshot documentSnapshot) {
           debugPrint(documentSnapshot.id);
           return Ingredient(id: documentSnapshot.id, name: documentSnapshot["name"], searchableIndex: documentSnapshot["searchableIndex"]);
         }).toList());
@@ -135,7 +135,7 @@ class DatabaseService {
   }
 
   Stream<List<RecipeIngredient>> recipeIngredientFromRecipe(Recipe recipe) {
-    return recipeCollection
+    return _recipeCollection
         .doc(recipe.id)
         .collection('recipeIngredients')
         .orderBy('amount', descending: true)
@@ -144,5 +144,43 @@ class DatabaseService {
               return RecipeIngredient(
                   name: documentSnapshot["name"], id: documentSnapshot.id, amount: documentSnapshot["amount"], einheit: documentSnapshot["einheit"], ingredientId: documentSnapshot["ingredientId"]);
             }).toList());
+  }
+
+  Future<List<RecipeIngredient>> recipeIngredientsFutureFromRecipe(Recipe recipe) {
+    return _recipeCollection
+        .doc(recipe.id)
+        .collection('recipeIngredients')
+        .snapshots()
+        .map((QuerySnapshot querySnapshot) => querySnapshot.docs
+            .map((QueryDocumentSnapshot documentSnapshot) {
+              return RecipeIngredient(
+                  name: documentSnapshot["name"], id: documentSnapshot.id, amount: documentSnapshot["amount"], einheit: documentSnapshot["einheit"], ingredientId: documentSnapshot["ingredientId"]);
+            })
+            .toList()
+            .first)
+        .toList();
+  }
+
+  void createNewList(String name, CustomUser user) {
+    ListModel model = ListModel(userId: user.uid!, name: name, created: Timestamp.now(), owner: user.displayName!, zutaten: []);
+    _listCollection.add(model.toJson()).then((value) => _listCollection.doc(value.id).update({"id": value.id}));
+  }
+
+  Future<void> createRecipe(Recipe recipe, CustomUser user, List<RecipeIngredient> recipeIngredients) async {
+    CustomUser? userData = await getUserData(user.uid!);
+    recipe.author = userData.displayName;
+    _recipeCollection.add(recipe.toJson()).then((value) {
+      _recipeCollection.doc(value.id).update({"id": value.id});
+      for (var element in recipeIngredients) {
+        _recipeCollection.doc(value.id).collection('recipeIngredients').add(element.toJson()).then((value) =>{
+          _recipeCollection.doc(value.id).collection('recipeIngredients').doc(value.id).update({"id": value.id})
+        });
+      }
+    });
+  }
+
+  Future<String> createIngredient(String name) async{
+    DocumentReference<Object?> documentReference = await _ingredientCollection.add(Ingredient(name: name).toJson());
+    return documentReference.id;
   }
 }

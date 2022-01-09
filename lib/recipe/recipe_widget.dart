@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:recipe_book/authenticate/authenticate.dart';
 import 'package:recipe_book/create_recipe/creator.dart';
 import 'package:recipe_book/models/categorie.dart';
+import 'package:recipe_book/models/user.dart';
 import 'package:recipe_book/recipe/recipe_list.dart';
 import 'package:recipe_book/services/database.dart';
 import '../../models/recipe.dart';
 import '../../shared/constants.dart';
 
 class RecipeWidget extends StatefulWidget {
-  const RecipeWidget({Key? key}) : super(key: key);
+  final Function? setIndex;
+  const RecipeWidget({Key? key, this.setIndex}) : super(key: key);
 
   @override
   State<RecipeWidget> createState() => _RecipeWidgetState();
@@ -19,6 +22,7 @@ class _RecipeWidgetState extends State<RecipeWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final CustomUser? user = Provider.of<CustomUser?>(context);
     return StreamProvider<List<Recipe>>.value(
       value: DatabaseService().recipesByCategorie(_categorie),
       initialData: const [],
@@ -68,7 +72,7 @@ class _RecipeWidgetState extends State<RecipeWidget> {
                               textScaleFactor: 1.2,
                             ),
                             const SizedBox(height: 20),
-                            ElevatedButton(
+                            user != null ? ElevatedButton(
                                 style: ButtonStyle(
                                     backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
                                     shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(5), side: const BorderSide(color: primaryColor, width: 2)))),
@@ -79,7 +83,7 @@ class _RecipeWidgetState extends State<RecipeWidget> {
                                     MaterialPageRoute(builder: (context) => const RecipeCreator()),
                                   );
                                 },
-                                child: Text('Neues Rezept erstellen', style: coloredText.style)),
+                                child: Text('Neues Rezept erstellen', style: coloredText.style)) : Text("Bitte anmelden", style: coloredText.style,),
                             const SizedBox(height: 20),
                           ],
                         ),

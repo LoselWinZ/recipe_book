@@ -7,9 +7,8 @@ import '../services/database.dart';
 
 class MealListViewer extends StatefulWidget {
   final String? listId;
-  final int? previousIndex;
 
-  const MealListViewer({Key? key, this.listId, this.previousIndex}) : super(key: key);
+  const MealListViewer({Key? key, this.listId}) : super(key: key);
 
   @override
   _MealListViewerState createState() => _MealListViewerState();
@@ -28,8 +27,8 @@ class _MealListViewerState extends State<MealListViewer> with TickerProviderStat
     final TextEditingController _nameController = TextEditingController();
     final TextEditingController _amountController = TextEditingController();
 
-    return StreamBuilder<MealList?>(
-        stream: db.getMealList(widget.listId!),
+    return StreamBuilder<MealList>(
+        stream: widget.listId != null ? db.getMealList(widget.listId!) : const Stream.empty(),
         builder: (context, snapshot) {
           return Scaffold(
             body: Column(
@@ -74,7 +73,7 @@ class _MealListViewerState extends State<MealListViewer> with TickerProviderStat
                             name = snapshot.data!.recipes![index].name!;
                             _amountController.text = snapshot.data!.recipes![index].amount!;
                             amount = snapshot.data!.recipes![index].amount!;
-                            openModal(context, _nameController, snapshot, db, _amountController, true, snapshot.data!.recipes![index]);
+                            openModal(context, _nameController, snapshot, _amountController, true, snapshot.data!.recipes![index]);
                           },
                           child: Material(
                             child: CheckboxListTile(
@@ -100,19 +99,21 @@ class _MealListViewerState extends State<MealListViewer> with TickerProviderStat
                 )
               ],
             ),
+            backgroundColor: backgroundColor,
             floatingActionButton: FloatingActionButton(
               onPressed: () {
-                openModal(context, _nameController, snapshot, db, _amountController, false);
+                openModal(context, _nameController, snapshot, _amountController, false);
+                amount = '';
+                name = '';
               },
               backgroundColor: primaryColor,
-              child: const Icon(Icons.style),
+              child: const Icon(Icons.add),
             ),
-            backgroundColor: backgroundColor,
           );
         });
   }
 
-  void openModal(BuildContext context, TextEditingController _controller, AsyncSnapshot<MealList?> snapshot, DatabaseService db, TextEditingController _amountController, bool edit, [ListItem? item]) {
+  void openModal(BuildContext context, TextEditingController _controller, AsyncSnapshot<MealList?> snapshot, TextEditingController _amountController, bool edit, [ListItem? item]) {
     showModalBottomSheet(
             context: context,
             isScrollControlled: true,

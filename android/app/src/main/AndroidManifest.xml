@@ -1,9 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="web.antl.recipe_book">
    <application
-        android:label="recipe_book"
+        android:label="Essen für dich und mich"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/recipe_book_icon_1024">
         <activity
             android:name=".MainActivity"
             android:exported="true"

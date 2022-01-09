@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:provider/provider.dart';
-import 'package:recipe_book/services/parser.dart';
 import 'package:recipe_book/shared/app_bar.dart';
 import 'package:recipe_book/shared/constants.dart';
 
@@ -68,7 +67,7 @@ class _ViewerState extends State<Viewer> {
                         ],
                       ),
                       // Text(ParserService().convert(widget.recipe.preparation!), style: coloredText.style),
-                      Html(data: widget.recipe.preparation!, style: {"p": Style(color: textColor), "li": Style(color: textColor),"before": Style(color: textColor)})
+                      Html(data: widget.recipe.preparation!, style: {"p": Style(color: textColor), "li": Style(color: textColor),"before": Style(color: textColor),"*": Style(color: textColor), "ol": Style(color: textColor), "li::marker": Style(color: textColor)})
                     ]),
                   ),
                   color: backgroundColorLight),

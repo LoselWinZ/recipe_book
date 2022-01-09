@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:recipe_book/list/lists_provider.dart';
-import 'package:recipe_book/search/search.dart';
+import 'package:recipe_book/search/search_view.dart';
 import 'package:recipe_book/shared/app_bar.dart';
 import 'package:recipe_book/shared/constants.dart';
 
@@ -20,7 +20,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
   
   
   int _selectedIndex = 0;
-  static final List<Widget> _widgetOptions = <Widget>[const RecipeWidget(), const SearchProvider(), const ListsProvider(), const Authenticate()];
+  static final List<Widget> _widgetOptions = <Widget>[const RecipeWidget(), const SearchView(), const ListsProvider(), const Authenticate()];
   final List<String> names = ["Rezepte", "Suche", "Einkaufslisten", "Account"];
 
   void _onItemTapped(int index) {

@@ -47,6 +47,8 @@ class _SignInState extends State<SignIn> {
                           onChanged: (val) => setState(() => email = val),
                           validator: (val) => val!.isEmpty ? 'Bitte ausfüllen' : null,
                           style: coloredText.style,
+                          autofillHints: const [AutofillHints.email],
+
                           decoration: textInputDecoration.copyWith(hintText: 'Email', prefixIcon: Icon(Icons.mail, color: textColor))),
                       const SizedBox(height: 20),
                       TextFormField(
@@ -54,6 +56,7 @@ class _SignInState extends State<SignIn> {
                           obscureText: true,
                           validator: (val) => val!.length < 6 ? 'Mindestens 6 Zeichen' : null,
                           style: coloredText.style,
+                          autofillHints: const [AutofillHints.password],
                           decoration: textInputDecoration.copyWith(hintText: 'Passwort', prefixIcon: Icon(Icons.lock, color: textColor))),
                       const SizedBox(height: 20),
                       ElevatedButton(
@@ -62,7 +65,6 @@ class _SignInState extends State<SignIn> {
                         if (_formKey.currentState != null && _formKey.currentState!.validate()) {
                           setState(() => loading = true);
                           dynamic user = await _authService.login(email, password);
-                          debugPrint(user);
                           if (user == null) {
                             setState(() {
                               error = 'user not found';

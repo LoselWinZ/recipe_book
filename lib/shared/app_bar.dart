@@ -36,7 +36,8 @@ class _CustomAppBarState extends State<CustomAppBar> {
               : const SizedBox(width: 0, height: 0),
           Text(widget.text != null ? widget.text! : '', style: coloredText.style)
         ]),
-        actions: <Widget>[showPopupButton()]);
+        // actions: <Widget>[showPopupButton()]
+    );
   }
 
   Widget showPopupButton() {

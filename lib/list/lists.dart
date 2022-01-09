@@ -15,22 +15,22 @@ class Lists extends StatefulWidget {
 }
 
 class _ListsState extends State<Lists> {
-  String getGroupHeader(int month) {
-    if (month == DateTime.now().month) {
+  String getGroupHeader(DateTime date) {
+    if (date.month == DateTime.now().month) {
       return "Dieser Monat";
     }
     var dateTime = DateTime.now();
-    DateTime(dateTime.year, month);
-    return DateFormat("MMMM").format(DateTime(dateTime.year, month));
+    DateTime(dateTime.year, date.month);
+    return DateFormat("MMMM").format(DateTime(dateTime.year, date.month));
   }
 
   @override
   Widget build(BuildContext context) {
     final lists = Provider.of<List<ListModel>>(context);
-    return GroupedListView<ListModel, int>(
+    return GroupedListView<ListModel, DateTime>(
       elements: lists,
-      groupBy: (ListModel element) => element.created!.toDate().month,
-      groupSeparatorBuilder: (int groupByValue) => Padding(
+      groupBy: (ListModel element) => DateTime(element.created!.toDate().year, element.created!.toDate().month),
+      groupSeparatorBuilder: (DateTime groupByValue) => Padding(
         padding: const EdgeInsets.only(top: 8.0),
         child: Center(
           child: Text(

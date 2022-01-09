@@ -10,4 +10,8 @@ class Ingredient {
   static Ingredient fromJson(Map<String, dynamic> json) {
     return Ingredient(name: json['name'], id: json['objectID']);
   }
+
+  Map<String, Object?> toJson() {
+    return {"id": id, "name": name, "searchableIndex": searchableIndex};
+  }
 }

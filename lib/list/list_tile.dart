@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:recipe_book/models/list_model.dart';
 
-import 'ListViewer.dart';
+import 'list_viewers_container.dart';
 
 class ListModelTile extends StatelessWidget {
   final ListModel? model;
@@ -22,7 +22,7 @@ class ListModelTile extends StatelessWidget {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => ListViewer(uid: model!.id)),
+              MaterialPageRoute(builder: (context) => ListViewersContainer(uid: model!.id)),
             );
           },
           contentPadding: const EdgeInsets.only(top: 0),
