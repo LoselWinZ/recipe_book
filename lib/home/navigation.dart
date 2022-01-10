@@ -32,7 +32,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(text: names[_selectedIndex], setIndex: _onItemTapped,),
+      appBar: CustomAppBar(text: names[_selectedIndex], setIndex: _onItemTapped, showBackButton: false),
       body: _widgetOptions.elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[

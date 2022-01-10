@@ -275,6 +275,7 @@ class _ListViewerState extends State<ListViewer> {
                             ),
                             TextFormField(
                               autofocus: false,
+                              style: coloredText.style,
                               decoration: textInputDecoration.copyWith(hintText: 'Rezept Suchen...', prefixIcon: Icon(Icons.search, color: textColor)),
                               controller: _textFieldController,
                               onChanged: (val) {
