@@ -47,6 +47,7 @@ class _RecipeWidgetState extends State<RecipeWidget> {
                             ),
                             const SizedBox(height: 20),
                             DropdownButtonFormField(
+                              value: _categorie,
                               items: Categorie.values
                                   .map((categorie) => DropdownMenuItem(
                                       child: Text(
@@ -59,6 +60,7 @@ class _RecipeWidgetState extends State<RecipeWidget> {
                                 setState(() {
                                   _categorie = value as Categorie?;
                                 });
+                                Navigator.pop(context);
                               },
                               dropdownColor: backgroundColorLight,
                               hint: Text('Kategorie', style: coloredText.style),

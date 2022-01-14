@@ -64,9 +64,10 @@ class _ListsProviderState extends State<ListsProvider> {
                                   setState(() {
                                     name = '';
                                   });
+                                  Navigator.pop(context);
                                 },
                                 child: Text('Erstellen', style: coloredText.style)),
-                            const SizedBox(height: 20)
+                            const SizedBox(height: 25)
                           ],
                         ),
                       ),
@@ -74,7 +75,7 @@ class _ListsProviderState extends State<ListsProvider> {
                   );
                 },
                 backgroundColor: backgroundColor,
-                constraints: const BoxConstraints(maxHeight: 500));
+                constraints: const BoxConstraints(maxHeight: 550));
           },
           backgroundColor: primaryColor,
           child: const Icon(Icons.add),

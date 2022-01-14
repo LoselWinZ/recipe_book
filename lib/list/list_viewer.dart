@@ -25,7 +25,6 @@ class _ListViewerState extends State<ListViewer> {
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
-  final PageController _pageController = PageController();
 
   String _searchText = "";
   List<Recipe> _hitsList = [];
@@ -149,8 +148,14 @@ class _ListViewerState extends State<ListViewer> {
             isScrollControlled: true,
             shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(35.0))),
             builder: (context) {
+              PageController _pageController = PageController(initialPage: 1);
+              if(item == null) {
+                _pageController = PageController(initialPage: 0);
+              }
+
               return StatefulBuilder(
                 builder: (BuildContext context, StateSetter setState) {
+
                   return Padding(
                     padding: MediaQuery.of(context).viewInsets,
                     child: PageView(

@@ -161,9 +161,17 @@ class DatabaseService {
         .toList();
   }
 
-  void createNewList(String name, CustomUser user) {
-    ListModel model = ListModel(userId: user.uid!, name: name, created: Timestamp.now(), owner: user.displayName!, zutaten: []);
-    _listCollection.add(model.toJson()).then((value) => _listCollection.doc(value.id).update({"id": value.id}));
+  Future<void> createNewList(String name, CustomUser user) async {
+    CustomUser? userData = await getUserData(user.uid!);
+    ListModel model = ListModel(userId: user.uid!, name: name, created: Timestamp.now(), owner: userData.displayName, zutaten: []);
+    _listCollection.add(model.toJson()).then((value) {
+      _listCollection.doc(value.id).update({"id": value.id});
+      _listCollection
+          .doc(value.id)
+          .collection('mealList')
+          .add(MealList(name: name, owner: userData.displayName, created: Timestamp.now(), userId: user.uid, recipes: []).toJson())
+          .then((mealListAdd) => _listCollection.doc(value.id).collection('mealList').doc(mealListAdd.id).update({"id": mealListAdd.id}));
+    });
   }
 
   Future<void> createRecipe(Recipe recipe, CustomUser user, List<RecipeIngredient> recipeIngredients) async {
@@ -172,14 +180,14 @@ class DatabaseService {
     _recipeCollection.add(recipe.toJson()).then((value) {
       _recipeCollection.doc(value.id).update({"id": value.id});
       for (var element in recipeIngredients) {
-        _recipeCollection.doc(value.id).collection('recipeIngredients').add(element.toJson()).then((value) =>{
-          _recipeCollection.doc(value.id).collection('recipeIngredients').doc(value.id).update({"id": value.id})
-        });
+        _recipeCollection.doc(value.id).collection('recipeIngredients').add(element.toJson()).then((value) => {
+              _recipeCollection.doc(value.id).collection('recipeIngredients').doc(value.id).update({"id": value.id})
+            });
       }
     });
   }
 
-  Future<String> createIngredient(String name) async{
+  Future<String> createIngredient(String name) async {
     DocumentReference<Object?> documentReference = await _ingredientCollection.add(Ingredient(name: name).toJson());
     return documentReference.id;
   }
