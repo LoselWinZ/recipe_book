@@ -56,7 +56,7 @@ class _IngredientCardState extends State<IngredientCard> {
                                         onPressed: () {
                                           if (multiplier == 1) return;
                                           setState(() {
-                                            multiplier ??= widget.recipe.portions! - 1;
+                                            multiplier ??= widget.recipe.portions!;
                                             multiplier = multiplier! - 1;
                                           });
                                         },
@@ -77,7 +77,7 @@ class _IngredientCardState extends State<IngredientCard> {
                                         onPressed: () {
                                           if (multiplier == 20) return;
                                           setState(() {
-                                            multiplier ??= widget.recipe.portions! + 1;
+                                            multiplier ??= widget.recipe.portions!;
                                             multiplier = multiplier! + 1;
                                           });
                                         },

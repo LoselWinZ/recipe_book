@@ -219,6 +219,7 @@ class _ListViewerState extends State<ListViewer> {
                                       style: coloredText.style,
                                       decoration: textInputDecoration.copyWith(hintText: 'Name', prefixIcon: Icon(Icons.text_snippet_outlined, color: textColor)),
                                       controller: _controller,
+                                      onEditingComplete: () {},
                                       onFieldSubmitted: (value) {
                                         if (!edit) saveItem(providedSnapshot, name, amount);
                                         if (edit) updateItem(providedSnapshot, item!, name, amount);
